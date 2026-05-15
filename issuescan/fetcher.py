@@ -17,11 +17,15 @@ def parse_input(raw: str) -> tuple[str, str]:
 
     m = _URL_RE.search(raw)
     if m:
-        return m.group(1), m.group(2)
+        repo, num = m.group(1), m.group(2)
+        _validate_number(num)
+        return repo, num
 
     m = _SHORT_RE.match(raw)
     if m:
-        return m.group(1), m.group(2)
+        repo, num = m.group(1), m.group(2)
+        _validate_number(num)
+        return repo, num
 
     raise ValueError(
         f"Cannot parse issue reference: {raw!r}\n"
@@ -29,6 +33,11 @@ def parse_input(raw: str) -> tuple[str, str]:
         "  https://github.com/owner/repo/issues/123\n"
         "  owner/repo#123"
     )
+
+
+def _validate_number(num: str) -> None:
+    if not num.isdigit() or not (1 <= int(num) <= 999_999):
+        raise ValueError(f"Invalid issue number: {num!r}")
 
 
 def fetch_issue(repo: str, number: str) -> dict:
